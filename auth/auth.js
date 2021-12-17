@@ -7,11 +7,10 @@ const verifyArtist = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, TOKEN_SECRET);
     ArtistModel.find({ _id: data.art_ID })
-      .then((result) => (req.art_ID = result))
-      .catch((e) => {
-        res.json({ error: "Invalid access" });
-      });
-    next();
+      .then((result) => {
+        req.info = result[0]
+        next();
+      })
   } catch (error) {
     res.json({ error: "Invalid access" });
   }

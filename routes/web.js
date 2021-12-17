@@ -43,7 +43,7 @@ router.get("/artist", (req, res) => {
 });
 
 router.delete("/artist/delete", verifyArtist, (req, res) => {
-    console.log(req.art_ID)
+    console.log(req.id)
     res.json({ message: "document deleted!!!" });
 });
 
@@ -65,5 +65,23 @@ router.post("/artist/login", (req, res) => {
     });
   });
 });
+
+
+// artist profile update
+
+router.put("/artist/profile/update",verifyArtist, (req, res)=>{
+  const id = req.info._id
+  const newGener = req.body.gener
+  try {
+    ArtistModel.updateOne({_id: id}, {gener: newGener})
+    .then((result)=>{
+      res.json("updated successfully")
+    })
+  } catch (error) {
+    console.log(error)
+  }
+
+})
+
 
 export default router;
