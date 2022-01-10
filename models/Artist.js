@@ -51,6 +51,11 @@ const artistSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  isBlocked: {
+    type: Boolean,
+    required: true,
+    default: false, // default value
+  },
 });
 
 const Artist = mongoose.model("Artist", artistSchema);
