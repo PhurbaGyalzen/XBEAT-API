@@ -1,14 +1,58 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const artistSchema = mongoose.Schema(
+const artistSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  gener: {
+    type: String,
+    required: true,
+  },
+  profile: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: false,
+  },
+  albums: [
     {
-        username: {type: String},
-        name: {type: String},
-        password: {type: String},
-        gener: {type: String},
-    }
-)
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Album",
+    },
+  ],
+  songs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Song",
+    },
+  ],
+  followers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  following: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+});
 
-const ArtistModel = mongoose.model("artist", artistSchema);
+const Artist = mongoose.model("Artist", artistSchema);
 
-export default ArtistModel;
+export default Artist;
