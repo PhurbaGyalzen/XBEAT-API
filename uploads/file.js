@@ -4,7 +4,7 @@ import path from "path";
 // optimized function to upload Image Files in uploads folder
 const uploadImage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads");
+    cb(null, "./Images");
   },
   filename: (req, file, cb) => {
     const fileName = file.originalname.toLowerCase().split(" ").join("-");
@@ -26,7 +26,7 @@ const uploadImage = multer.diskStorage({
 const uploadAudio = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "./uploads/");
+      cb(null, "./Audio");
     },
     filename: (req, file, cb) => {
       cb(null, file.originalname);
