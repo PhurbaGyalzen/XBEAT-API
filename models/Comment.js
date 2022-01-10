@@ -9,14 +9,6 @@ const commentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  song: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Song",
-  },
-  album: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Album",
-  },
 });
 
 const Comment = mongoose.model("Comment", commentSchema);
