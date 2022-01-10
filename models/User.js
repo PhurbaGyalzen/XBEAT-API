@@ -65,12 +65,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: false, // default value
   },
-  playList: [ 
+  playList: [
     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "PlayList",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PlayList",
+      required: false, // default value
     },
-    ],
+  ],
 });
 
 const User = mongoose.model("User", userSchema);
