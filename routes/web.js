@@ -3,8 +3,13 @@ import ArtistModel from "../models/Artist.js";
 import bcrypt from "bcryptjs";
 const router = new express.Router();
 import jwt from "jsonwebtoken";
-import verifyArtist from "../auth/auth.js";
-const TOKEN_SECRET = "asdfjakdsfuaunfsadifbaskljvasdfasdf";
+import verifyArtist from "../middlewares/auth/auth.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+const TOKEN_SECRET = process.env.TOKEN_SECRET;
+
+console.log(TOKEN_SECRET);
 
 // route for artist
 router.post("/artist/register", (req, res) => {
@@ -43,8 +48,8 @@ router.get("/artist", (req, res) => {
 });
 
 router.delete("/artist/delete", verifyArtist, (req, res) => {
-    console.log(req.id)
-    res.json({ message: "document deleted!!!" });
+  console.log(req.id);
+  res.json({ message: "document deleted!!!" });
 });
 
 router.post("/artist/login", (req, res) => {
@@ -66,22 +71,20 @@ router.post("/artist/login", (req, res) => {
   });
 });
 
-
 // artist profile update
 
-router.put("/artist/profile/update",verifyArtist, (req, res)=>{
-  const id = req.info._id
-  const newGener = req.body.gener
+router.put("/artist/profile/update", verifyArtist, (req, res) => {
+  const id = req.user._id;
+  const newGener = req.body.gener;
   try {
-    ArtistModel.updateOne({_id: id}, {gener: newGener})
-    .then((result)=>{
-      res.json("updated successfully")
-    })
+    ArtistModel.updateOne({ _id: id }, { gener: newGener }).then((result) => {
+      res.json("updated successfully");
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
+});
 
-})
-
+// stream songs
 
 export default router;

@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
-import ArtistModel from "../models/Artist.js";
-const TOKEN_SECRET = "asdfjakdsfuaunfsadifbaskljvasdfasdf";
+import ArtistModel from "../../models/Artist.js";
+
+
+const TOKEN_SECRET = process.env.TOKEN_SECRET
 
 const verifyArtist = (req, res, next) => {
   try {
@@ -8,7 +10,7 @@ const verifyArtist = (req, res, next) => {
     const data = jwt.verify(token, TOKEN_SECRET);
     ArtistModel.find({ _id: data.art_ID })
       .then((result) => {
-        req.info = result[0]
+        req.user = result[0]
         next();
       })
   } catch (error) {
