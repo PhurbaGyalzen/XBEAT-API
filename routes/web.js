@@ -11,40 +11,48 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 console.log(TOKEN_SECRET);
 
-// route for artist
-router.post("/artist/register", (req, res) => {
-  const username = req.body.username;
-  ArtistModel.findOne({ username: username }).then((artistData) => {
+// register artist
+router.post("/artist/register", async (req, res) => {
+  try {
+    const username = req.body.username;
+    const artistData = await ArtistModel.findOne({ username: username });
     if (artistData != null) {
-      res.json({ message: "Username already exisits" });
+      res.status(400).json({ error: "Username already exists" });
       return;
     }
     const password = req.body.password;
-    bcrypt.hash(password, 10, (e, hashed_pw) => {
-      ArtistModel.create({
-        username: req.body.username,
-        name: req.body.name,
-        password: hashed_pw,
-        gener: req.body.gener,
-      })
-        .then(() =>
-          res.json({
-            message: `${req.body.username} artist registered successfully.`,
-          })
-        )
-        .catch((e) => res.json(e));
+    const hashed_pw = await bcrypt.hash(password, 10);
+    const artist = await ArtistModel.create({
+      username: req.body.username,
+      name: req.body.name,
+      password: hashed_pw,
+      profile: req.body.profile,
+      gener: req.body.gener,
     });
-  });
+    res.status(201).json({
+      message: "Artist registered successfully",
+      artist: artist._id,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
-router.get("/artist", (req, res) => {
-  const result = ArtistModel.find((e, docs) => {
-    if (!e) {
-      res.json(docs);
-    } else {
-      res.send(e);
+// get individual artist info
+router.get("/artist/:id", async (req, res) => {
+  try {
+    const artist = await ArtistModel.findById(req.params.id, { password: 0 });
+    if (!artist) {
+      res.status(404).json({ error: "Artist not found" });
+      return;
     }
-  });
+    res.status(200).json({
+      message: "Artist info",
+      artist: artist,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 router.delete("/artist/delete", verifyArtist, (req, res) => {

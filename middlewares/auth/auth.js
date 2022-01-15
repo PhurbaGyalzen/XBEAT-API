@@ -18,4 +18,5 @@ const verifyArtist = (req, res, next) => {
   }
 };
 
+
 export default verifyArtist;
