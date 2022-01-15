@@ -64,7 +64,7 @@ router.post("/artist/login", (req, res) => {
   const username = req.body.username;
   ArtistModel.findOne({ username: username }).then((artistData) => {
     if (artistData == null) {
-      res.json({ message: "Artist doesn't exits." });
+   .   res.json({ message: "Artist doesn't exits." });
       return;
     }
     const password = req.body.password;
