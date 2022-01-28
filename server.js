@@ -1,6 +1,6 @@
 import express from "express";
 import connectDB from "./db/connectDB.js";
-import web from "./routes/web.js";
+import artist_routes from "./routes/artist.routes.js";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -17,7 +17,7 @@ app.use(cors()); // to allow cross origin requests
 app.use(helmet()); // for security purpose
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-app.use("/", web); // for routing
+app.use("/", artist_routes); // for routing
 
 // starting the server
 app.listen(port, () => {
