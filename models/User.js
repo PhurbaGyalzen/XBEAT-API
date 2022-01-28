@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from "validator";
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -9,16 +10,39 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    validate: {
+      validator: function (value) {
+        return validator.isAlphanumeric(value);
+      },
+      message: function () {
+        return "Password must be alphanumeric";
+      }
+    }
   },
   email: {
     type: String,
     required: true,
     unique: true,
+    validate: {
+      validator: function (value) {
+        return validator.isEmail(value);
+      },
+      message: function () {
+        return "Email is invalid";
+      }
+    }
   },
   firstName: {
     type: String,
     required: true,
-  },
+    validate: {
+      validator: function (value) {
+        return validator.isAlpha(value);
+      },
+      message: function () {
+        return "First name must be alphabetic";
+      }
+  }},
   lastName: {
     type: String,
     required: true,
@@ -43,6 +67,18 @@ const userSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  albums: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Album",
+    },
+  ],
+  songs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Song",
+    },
+  ],
   likedSongs: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -55,10 +91,16 @@ const userSchema = new mongoose.Schema({
       ref: "Comment",
     },
   ],
-  isAdmin: {
+  role: {
     type: Boolean,
     required: true,
-    default: false, // default value
+    default: 'user',
+    enum: ['admin', 'user', 'artist'],
+    validate: {
+      validator: (value) => {
+        return value == 'admin' || value == 'user' || value == 'artist';
+      }
+  },
   },
   isBlocked: {
     type: Boolean,
