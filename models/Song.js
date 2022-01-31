@@ -7,23 +7,15 @@ const songSchema = new mongoose.Schema({
   },
   artist: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Artist",
+    ref: "User",
   },
   album: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Album",
   },
-  duration: {
-    type: Number,
-    required: true,
-  },
   url: {
     type: String,
     required: true,
-  },
-  lyrics: {
-    type: String,
-    required: false,
   },
   description: {
     type: String,

@@ -4,37 +4,18 @@ import validator from "validator";
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
+    required: [true, "Username is required"],
     unique: true,
+    trim: true
   },
   password: {
     type: String,
-    required: true,
-    validate: {
-      validator: function (value) {
-        return validator.isAlphanumeric(value);
-      },
-      message: function () {
-        return "Password must be alphanumeric";
-      }
-    }
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: function (value) {
-        return validator.isEmail(value);
-      },
-      message: function () {
-        return "Email is invalid";
-      }
-    }
+    required: [true, "Password is required"] // hide password from query
   },
   firstName: {
     type: String,
-    required: true,
+    required: false,
+    trim: true,
     validate: {
       validator: function (value) {
         return validator.isAlpha(value);
@@ -43,13 +24,25 @@ const userSchema = new mongoose.Schema({
         return "First name must be alphabetic";
       }
   }},
+  gener : {
+    type: String,
+    required: false,
+    validate: {
+      validator: function (value) {
+        return validator.isAlpha(value);
+      },
+      message: function () {
+        return "Gener must be alphabetic";
+      }
+  }},
   lastName: {
     type: String,
-    required: true,
+    required: false,
   },
   profile: {
     type: String,
-    required: false,
+    required: true,
+    default : "http://localhost:3000/images/default-profile.jpg"
   },
   description: {
     type: String,
@@ -92,15 +85,18 @@ const userSchema = new mongoose.Schema({
     },
   ],
   role: {
-    type: Boolean,
+    type: String,
     required: true,
     default: 'user',
     enum: ['admin', 'user', 'artist'],
     validate: {
-      validator: (value) => {
+      validator: function(value) {
         return value == 'admin' || value == 'user' || value == 'artist';
+      },
+      message: function() {
+        return "Role must be admin, user or artist";
       }
-  },
+    }
   },
   isBlocked: {
     type: Boolean,
@@ -114,6 +110,10 @@ const userSchema = new mongoose.Schema({
       required: false, // default value
     },
   ],
+  joinedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const User = mongoose.model("User", userSchema);

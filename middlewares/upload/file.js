@@ -34,7 +34,6 @@ const uploadAudio = multer({
   }),
   fileFilter: (req, file, cb) => {
     const fileTypes = /mp3|wav|mpeg/;
-    console.log(file.mimetype);
     const mimetype = fileTypes.test(file.mimetype);
     const extname = fileTypes.test(path.extname(file.originalname));
     if (mimetype && extname) {

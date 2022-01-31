@@ -1,5 +1,6 @@
 import express from "express";
-import ArtistModel from "../models/Artist.js";
+import UserModel from "../models/User.js";
+import SongModel from "../models/Song.js";
 import bcrypt from "bcryptjs";
 const router = new express.Router();
 import jwt from "jsonwebtoken";
@@ -11,10 +12,10 @@ import fs from "fs";
 import {
   registerArtist,
   getIndividualArtist,
-  deleteArtist,
   loginArtist,
   getArtists,
 } from "../controllers/artist.controllers.js";
+import Song from "../models/Song.js";
 
 dotenv.config();
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
@@ -28,49 +29,69 @@ router.get("/artist/:id", getIndividualArtist);
 // get all artists
 router.get("/artists", getArtists);
 
-router.delete("/artist/delete/:id", verifyArtist, deleteArtist);
-
 router.post("/artist/login", loginArtist);
 
-// artist profile update
-
-router.put("/artist/profile/update", verifyArtist, (req, res) => {
-  const id = req.user._id;
-  const newGener = req.body.gener;
-  try {
-    ArtistModel.updateOne({ _id: id }, { gener: newGener }).then((result) => {
-      res.json("updated successfully");
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
-
 // upload song file
-router.post("/upload/song", uploadAudio.single("audio"), (req, res) => {
-  const songFileName = req.file.filename;
-  const songFileUrl = `${process.env.SERVER_URL}/stream/song/${songFileName}`;
-  console.log(songFileUrl);
-  res.json({ songFileUrl });
-});
+router.post(
+  "/upload/song",
+  verifyArtist,
+  uploadAudio.single("audio"),
+  async (req, res) => {
+    try {
+      const songFileName = req.file.filename;
+      const songFileUrl = `${process.env.SERVER_URL}/stream/song/${songFileName}`;
+      const artist_id = req.user._id;
+      const title = req.body.title;
+      const description = req.body.description;
+      const genre = req.body.genre;
+      const song = await SongModel.create({
+        title: title,
+        artist: artist_id,
+        url: songFileUrl,
+        description,
+        genre,
+      });
+      console.log(song);
+      // add song to artist's songs
+      UserModel.updateOne(
+        { _id: artist_id },
+        { $addToSet: { songs: song } },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(result);
+          }
+        }
+      );
+      res.status(201).json({
+        message: "Song uploaded successfully",
+        song: song,
+      });
+    } catch (e) {
+      res.status(500).json({
+        error: e.message,
+      });
+    }
+  }
+);
 
-// server audio files from the server
+// serve audio files from the server
 const __dirname = path.resolve();
 router.get("/stream/song/:name", (req, res) => {
   const file = path.resolve(__dirname, "../Ass/upload/song/" + req.params.name);
-  const headers = {
-    "Content-Type": "audio/mpeg",
-    "Content-Length": fs.statSync(file).size,
-    "Content-Disposition": `attachment; filename="${req.params.name}"`,
-    "Accept-Ranges": "bytes",
-    "Connection": "keep-alive"
-  };
-
-  if (fs.existsSync(file)) {
+  try {
+    const headers = {
+      "Content-Type": "audio/mp3",
+      "Content-Length": fs.statSync(file).size,
+      "Content-Disposition": `attachment; filename="${req.params.name}"`,
+      "Accept-Ranges": "bytes",
+      Connection: "keep-alive",
+    };
     res.writeHead(200, headers);
     const readStream = fs.createReadStream(file);
     readStream.pipe(res);
-  } else {
+  } catch (err) {
     res.writeHead(404);
     res.end("File not found");
   }

@@ -1,4 +1,4 @@
-import Artist from "../models/Artist.js";
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -7,8 +7,12 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 // Get all artists
 export const getArtists = async (req, res) => {
-  const artists = await Artist.find({}, { password: 0 });
-  res.json(artists);
+  try {
+    const artists = await User.find({ role: "artist" });
+    res.json(artists);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // login artist
@@ -16,7 +20,7 @@ export const loginArtist = async (req, res) => {
   try {
     const username = req.body.username;
     const password = req.body.password;
-    const artist = await Artist.findOne({ username });
+    const artist = await User.findOne({ username });
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;
@@ -30,6 +34,7 @@ export const loginArtist = async (req, res) => {
     res.status(200).json({
       message: "Artist logged in successfully",
       token: token,
+      role: artist.role
     });
   } catch (error) {
     console.log(error);
@@ -39,7 +44,7 @@ export const loginArtist = async (req, res) => {
 // Get Individual artist
 export const getIndividualArtist = async (req, res) => {
   try {
-    const artist = await Artist.findById(req.params.id, { password: 0 });
+    const artist = await User.findById(req.params.id, { password: 0 });
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;
@@ -53,127 +58,27 @@ export const getIndividualArtist = async (req, res) => {
   }
 };
 
-// Create new artist
+// Register Artist
 export const registerArtist = async (req, res) => {
   try {
-    const username = req.body.username;
-    const artistData = await Artist.findOne({ username: username });
-    if (artistData != null) {
-      res.status(400).json({ error: "Username already exists" });
+    const artist = await User.findOne({ username: req.body.username });
+    if (artist) {
+      res.status(400).json({ error: "Artist already exists" });
       return;
     }
     const password = req.body.password;
-    const hashed_pw = await bcrypt.hash(password, 10);
-    const artist = await ArtistModel.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newArtist = await User.create({
       username: req.body.username,
-      name: req.body.name,
-      password: hashed_pw,
-      profile: req.body.profile,
-      gener: req.body.gener,
+      password: hashedPassword,
+      role: "artist",
     });
     res.status(201).json({
       message: "Artist registered successfully",
-      artist: artist._id,
+      artist: newArtist,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-};
-
-// Update artist
-export const updateArtist = async (req, res) => {
-  const { id } = req.params;
-  const artist = {
-    name: req.body.name,
-    description: req.body.description,
-    image: req.body.image,
-    songs: req.body.songs,
-  };
-  await Artist.findByIdAndUpdate(id, { $set: artist }, { new: true });
-  res.json({
-    status: "Artist Updated",
-  });
-};
-
-// Delete artist
-export const deleteArtist = async (req, res) => {
-  const { id } = req.params;
-  await Artist.findByIdAndRemove(id);
-  res.json({
-    status: "Artist Deleted",
-  });
-};
-
-// Get artist songs
-export const getArtistSongs = async (req, res) => {
-  const artist = await Artist.findById(req.params.id);
-  res.json(artist.songs);
-};
-
-// Add song to artist
-export const addSongToArtist = async (req, res) => {
-  const { id } = req.params;
-  const artist = await Artist.findById(id);
-  const song = {
-    name: req.body.name,
-    description: req.body.description,
-    image: req.body.image,
-    url: req.body.url,
-  };
-  artist.songs.push(song);
-  await artist.save();
-  res.json({
-    status: "Song Added",
-  });
-};
-
-// Delete song from artist
-export const deleteSongFromArtist = async (req, res) => {
-  const { id } = req.params;
-  const artist = await Artist.findById(id);
-  artist.songs.pull(req.body.songId);
-  await artist.save();
-  res.json({
-    status: "Song Deleted",
-  });
-};
-
-// Get artist albums
-export const getArtistAlbums = async (req, res) => {
-  const artist = await Artist.findById(req.params.id);
-  res.json(artist.albums);
-};
-
-// Add album to artist
-export const addAlbumToArtist = async (req, res) => {
-  const { id } = req.params;
-  const artist = await Artist.findById(id);
-  const album = {
-    name: req.body.name,
-    description: req.body.description,
-    image: req.body.image,
-    songs: req.body.songs,
-  };
-  artist.albums.push(album);
-  await artist.save();
-  res.json({
-    status: "Album Added",
-  });
-};
-
-// Delete album from artist
-export const deleteAlbumFromArtist = async (req, res) => {
-  const { id } = req.params;
-  const artist = await Artist.findById(id);
-  artist.albums.pull(req.body.albumId);
-  await artist.save();
-  res.json({
-    status: "Album Deleted",
-  });
-};
-
-// Get artist playlists
-export const getArtistPlaylists = async (req, res) => {
-  const artist = await Artist.findById(req.params.id);
-  res.json(artist.playlists);
 };
