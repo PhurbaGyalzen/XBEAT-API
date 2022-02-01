@@ -9,6 +9,10 @@ const commentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  song: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Song",
+  }
 });
 
 const Comment = mongoose.model("Comment", commentSchema);

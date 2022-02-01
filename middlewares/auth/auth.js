@@ -18,7 +18,7 @@ const verifyArtist = async (req, res, next) => {
       res.json({ error: "You are not an artist" });
     }
   } catch (error) {
-    res.json({ error: error });
+    res.json({ error: error.message });
   }
 };
 

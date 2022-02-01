@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import verifyArtist from "../middlewares/auth/auth.js";
 import dotenv from "dotenv";
 import { uploadAudio } from "../middlewares/upload/file.js";
+import {isSongOfArtist} from "../middlewares/auth/artist.js";
 import path from "path";
 import fs from "fs";
 import {
@@ -15,6 +16,9 @@ import {
   loginArtist,
   getArtists,
 } from "../controllers/artist.controllers.js";
+import {
+  deleteSong
+} from "../controllers/song.controllers.js";
 import Song from "../models/Song.js";
 
 dotenv.config();
@@ -75,6 +79,9 @@ router.post(
     }
   }
 );
+
+// delete a individual song of an artist
+router.delete("/artist/song/:song_id", verifyArtist, isSongOfArtist, deleteSong)
 
 // serve audio files from the server
 const __dirname = path.resolve();
