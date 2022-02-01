@@ -74,9 +74,11 @@ export const registerArtist = async (req, res) => {
       password: hashedPassword,
       role: "artist",
     });
+    const token = jwt.sign({ id: newArtist._id }, TOKEN_SECRET);
     res.status(201).json({
       message: "Artist registered successfully",
       artist: newArtist,
+      token: token,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
