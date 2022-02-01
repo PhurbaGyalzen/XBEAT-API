@@ -17,7 +17,8 @@ import {
   getArtists,
 } from "../controllers/artist.controllers.js";
 import {
-  deleteSong
+  deleteSong,
+  uploadSong,
 } from "../controllers/song.controllers.js";
 import Song from "../models/Song.js";
 
@@ -40,44 +41,7 @@ router.post(
   "/upload/song",
   verifyArtist,
   uploadAudio.single("audio"),
-  async (req, res) => {
-    try {
-      const songFileName = req.file.filename;
-      const songFileUrl = `${process.env.SERVER_URL}/stream/song/${songFileName}`;
-      const artist_id = req.user._id;
-      const title = req.body.title;
-      const description = req.body.description;
-      const genre = req.body.genre;
-      const song = await SongModel.create({
-        title: title,
-        artist: artist_id,
-        url: songFileUrl,
-        description,
-        genre,
-      });
-      console.log(song);
-      // add song to artist's songs
-      UserModel.updateOne(
-        { _id: artist_id },
-        { $addToSet: { songs: song } },
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(result);
-          }
-        }
-      );
-      res.status(201).json({
-        message: "Song uploaded successfully",
-        song: song,
-      });
-    } catch (e) {
-      res.status(500).json({
-        error: e.message,
-      });
-    }
-  }
+  uploadSong
 );
 
 // delete a individual song of an artist

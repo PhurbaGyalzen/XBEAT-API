@@ -1,6 +1,8 @@
 
 import Song from "../models/Song.js";
 import User from "../models/User.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 // delete a song from artist's songs
 export const deleteSong = async (req, res) => {
@@ -32,3 +34,42 @@ export const deleteSong = async (req, res) => {
   }
 };
 
+
+export const uploadSong = async (req, res) => {
+  try {
+    const songFileName = req.file.filename;
+    const songFileUrl = `${process.env.SERVER_URL}/stream/song/${songFileName}`;
+    const artist_id = req.user._id;
+    const title = req.body.title;
+    const description = req.body.description;
+    const genre = req.body.genre;
+    const song = await Song.create({
+      title: title,
+      artist: artist_id,
+      url: songFileUrl,
+      description,
+      genre,
+    });
+    console.log(song);
+    // add song to artist's songs
+    User.updateOne(
+      { _id: artist_id },
+      { $addToSet: { songs: song } },
+      (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(result);
+        }
+      }
+    );
+    res.status(201).json({
+      message: "Song uploaded successfully",
+      song: song,
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message,
+    });
+  }
+}
