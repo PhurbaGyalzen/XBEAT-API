@@ -16,7 +16,7 @@ connectDB(DATABASEURL); // connect to the database
 // initializing express
 const server = express(); // create an instance of express
 server.use(cors()); // to allow cross origin requests
-// server.use(helmet()); // for security purpose
+server.use(helmet()); // for security purpose
 server.use(express.json()); // for parsing application/json
 server.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 server.use(morgan("dev")); // for logging
