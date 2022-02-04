@@ -4,6 +4,7 @@ import artist_routes from "./routes/artist.routes.js";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import cors from "cors";
+import morgan from "morgan";
 
 dotenv.config(); // to read env variables
 
@@ -18,6 +19,7 @@ server.use(cors()); // to allow cross origin requests
 // server.use(helmet()); // for security purpose
 server.use(express.json()); // for parsing application/json
 server.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+server.use(morgan("dev")); // for logging
 server.use("/", artist_routes); // for routing
 
 server.use(express.static("public"));
