@@ -72,6 +72,8 @@ export const registerArtist = async (req, res) => {
     const newArtist = await User.create({
       username: req.body.username,
       password: hashedPassword,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       role: "artist",
     });
     const token = jwt.sign({ id: newArtist._id }, TOKEN_SECRET);
