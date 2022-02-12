@@ -34,7 +34,9 @@ export const loginArtist = async (req, res) => {
     res.status(200).json({
       message: "Artist logged in successfully",
       token: token,
-      role: artist.role
+      role: artist.role,
+      user_id: artist._id,
+
     });
   } catch (error) {
     console.log(error);
@@ -45,6 +47,23 @@ export const loginArtist = async (req, res) => {
 export const getIndividualArtist = async (req, res) => {
   try {
     const artist = await User.findById(req.params.id, { password: 0 });
+    if (!artist) {
+      res.status(404).json({ error: "Artist not found" });
+      return;
+    }
+    res.status(200).json({
+      message: "Artist info",
+      artist: artist,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// Get own artist info
+export const getOwnInfo = async (req, res) => {
+  try {
+    const artist = await User.findById(req.user._id, { password: 0 });
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;

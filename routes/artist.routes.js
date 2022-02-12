@@ -15,6 +15,7 @@ import {
   getIndividualArtist,
   loginArtist,
   getArtists,
+  getOwnInfo,
 } from "../controllers/artist.controllers.js";
 import { deleteSong, uploadSong } from "../controllers/song.controllers.js";
 import Song from "../models/Song.js";
@@ -24,6 +25,9 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 // register artist
 router.post("/artist/register", registerArtist);
+
+// get own artist info
+router.get("/artist", verifyArtist, getOwnInfo);
 
 // get individual artist info
 router.get("/artist/:id", getIndividualArtist);
