@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
   profile: {
     type: String,
     required: true,
-    default : "http://localhost:3000/images/default-profile.jpg"
+    default : "images/default-profile.jpg"
   },
   description: {
     type: String,
