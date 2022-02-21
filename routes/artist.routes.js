@@ -41,7 +41,18 @@ router.post("/artist/login", loginArtist);
 router.post(
   "/upload/song",
   verifyArtist,
-  uploadAudio.single("audio"),
+  uploadAudio.fields(
+    [
+      {
+        name: "audio",
+        maxCount: 1,
+      },
+      {
+        name: "thumbnail",
+        maxCount: 1,
+      },
+    ],
+  ),
   uploadSong
 );
 
@@ -57,6 +68,25 @@ router.delete(
 router.get("/artist/songs/:username", async (req, res) => {
   try {
     const artist = await UserModel.findOne({ username: req.params.username });
+    if (!artist) {
+      res.status(404).json({ error: "Artist not found" });
+      return;
+    }
+    const songs = await Song.find({ artist: artist._id });
+    res.status(200).json({
+      message: "Songs found successfully",
+      artist_name: artist.username,
+      songs: songs,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// get own songs
+router.get("/songs",verifyArtist, async (req, res) => {
+  try {
+    const artist = await UserModel.findOne({_id: req.user._id});
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;

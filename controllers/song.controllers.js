@@ -37,8 +37,10 @@ export const deleteSong = async (req, res) => {
 
 export const uploadSong = async (req, res) => {
   try {
-    const songFileName = req.file.filename;
+    const songFileName = req.files.audio[0].filename;
     const songFileUrl = `stream/song/${songFileName}`;
+    const thumbnailFileName = req.files.thumbnail[0].filename;
+    const thumbnailFileUrl = `images/thumbnail/${thumbnailFileName}`;
     const artist_id = req.user._id;
     const title = req.body.title;
     const description = req.body.description;
@@ -47,6 +49,7 @@ export const uploadSong = async (req, res) => {
       title: title,
       artist: artist_id,
       url: songFileUrl,
+      thumbnail: thumbnailFileUrl,
       description,
       genre,
     });

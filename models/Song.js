@@ -17,6 +17,11 @@ const songSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  thumbnail : {
+    type: String,
+    required: true,
+    default: "images/thumbnail/default-thumbnail.png"
+  },
   description: {
     type: String,
     required: false,

@@ -18,30 +18,61 @@ const uploadImage = multer.diskStorage({
     cb(null, true);
   },
   limits: {
-    fileSize: 1024 * 1024 * 5
-  }
+    fileSize: 1024 * 1024 * 5,
+  },
 });
-
 
 const uploadAudio = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "./upload/song");
+      if (file.fieldname === "audio") {
+        // if audio file
+        cb(null, "./upload/song");
+      } else {
+        // if image file
+        cb(null, "./public/images/thumbnail");
+      }
     },
-    filename: (req, file, cb) => {
-      cb(null, file.originalname);
+    filename: function (req, file, callback) {
+      console.log(file);
+      if (file.originalname.length > 6)
+        callback(
+          null,
+          file.fieldname +
+            "-" +
+            Date.now() +
+            file.originalname.slice(file.originalname.length - 4)
+        );
+      else
+        callback(null, file.fieldname + "-" + Date.now() + file.originalname);
     },
   }),
   fileFilter: (req, file, cb) => {
-    const fileTypes = /mp3|wav|mpeg/;
-    const mimetype = fileTypes.test(file.mimetype);
-    const extname = fileTypes.test(path.extname(file.originalname));
-    if (mimetype && extname) {
-      return cb(null, true);
+    if (file.fieldname === "audio") {
+      const fileTypes = /mp3|wav|mpeg/;
+      const mimetype = fileTypes.test(file.mimetype);
+      const extname = fileTypes.test(path.extname(file.originalname));
+      if (mimetype && extname) {
+        return cb(null, true);
+      }
+      cb(
+        "Error: File upload only supports the following file types - " +
+          fileTypes
+      );
+    } else { // if image file
+      if (
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/jpg" ||
+        file.mimetype === "image/jpeg" || 
+        file.mimetype === "image/gif"
+      ) {
+        // check file type to be png, jpeg, or jpg
+        return cb(null, true);
+      } else {
+        cb("Error: Thumnail should be image type.", false); // else fail
+      }
     }
-    cb("Error: File upload only supports the following file types - " + fileTypes);
   },
 });
-
 
 export { uploadImage, uploadAudio };
