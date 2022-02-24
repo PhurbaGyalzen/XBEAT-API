@@ -43,6 +43,29 @@ export const loginArtist = async (req, res) => {
   }
 };
 
+// upload profile picture
+export const uploadProfile = async (req, res) => {
+  try {
+    console.log(req.file);
+    const profileImageFileName = req.file.filename;
+    const profileFileUrl = `images/profile/${profileImageFileName}`
+    const artist = await User.findById(req.user._id);
+    if (!artist) {
+      res.status(404).json({ error: "Artist not found" });
+      return;
+    }
+    // overwrite the profile image
+    const result = await User.findByIdAndUpdate(artist._id, { profile: profileFileUrl });
+    // console.log(result);
+    res.status(200).json({
+      message: "Profile image uploaded successfully",
+      profile_image: profileFileUrl,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
 // Get Individual artist
 export const getIndividualArtist = async (req, res) => {
   try {

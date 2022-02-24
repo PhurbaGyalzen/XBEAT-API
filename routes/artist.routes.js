@@ -6,7 +6,7 @@ const router = new express.Router();
 import jwt from "jsonwebtoken";
 import verifyArtist from "../middlewares/auth/auth.js";
 import dotenv from "dotenv";
-import { uploadAudio } from "../middlewares/upload/file.js";
+import { uploadAudio, uploadImage } from "../middlewares/upload/file.js";
 import { isSongOfArtist } from "../middlewares/auth/artist.js";
 import path from "path";
 import fs from "fs";
@@ -16,6 +16,7 @@ import {
   loginArtist,
   getArtists,
   getOwnInfo,
+  uploadProfile,
 } from "../controllers/artist.controllers.js";
 import { deleteSong, uploadSong } from "../controllers/song.controllers.js";
 import Song from "../models/Song.js";
@@ -41,19 +42,25 @@ router.post("/artist/login", loginArtist);
 router.post(
   "/upload/song",
   verifyArtist,
-  uploadAudio.fields(
-    [
-      {
-        name: "audio",
-        maxCount: 1,
-      },
-      {
-        name: "thumbnail",
-        maxCount: 1,
-      },
-    ],
-  ),
+  uploadAudio.fields([
+    {
+      name: "audio",
+      maxCount: 1,
+    },
+    {
+      name: "thumbnail",
+      maxCount: 1,
+    },
+  ]),
   uploadSong
+);
+
+// update profile picture
+router.patch(
+  "/artist/profile",
+  verifyArtist,
+  uploadImage.single("image"),
+  uploadProfile
 );
 
 // delete a individual song of an artist
@@ -84,9 +91,9 @@ router.get("/artist/songs/:username", async (req, res) => {
 });
 
 // get own songs
-router.get("/songs",verifyArtist, async (req, res) => {
+router.get("/songs", verifyArtist, async (req, res) => {
   try {
-    const artist = await UserModel.findOne({_id: req.user._id});
+    const artist = await UserModel.findOne({ _id: req.user._id });
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;

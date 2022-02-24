@@ -2,24 +2,28 @@ import multer from "multer";
 import path from "path";
 
 // optimized function to upload Image Files in uploads folder
-const uploadImage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./Images");
-  },
-  filename: (req, file, cb) => {
-    const fileName = file.originalname.toLowerCase().split(" ").join("-");
-    cb(null, `${Date.now()}-${fileName}`);
-  },
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
-      return cb(new Error("Only images are allowed"));
-    }
-    cb(null, true);
-  },
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
+const uploadImage = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./public/images/profile");
+    },
+    filename: (req, file, cb) => {
+      const fileName = file.originalname.toLowerCase().split(" ").join("-");
+      cb(null, `${Date.now()}-${fileName}`);
+    },
+    fileFilter: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      if (
+        ext !== ".png" &&
+        ext !== ".jpg" &&
+        ext !== ".jpeg" &&
+        ext !== "gif"
+      ) {
+        return cb(new Error("Only images are allowed"));
+      }
+      cb(null, true);
+    },
+  }),
 });
 
 const uploadAudio = multer({
@@ -59,11 +63,12 @@ const uploadAudio = multer({
         "Error: File upload only supports the following file types - " +
           fileTypes
       );
-    } else { // if image file
+    } else {
+      // if image file
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||
-        file.mimetype === "image/jpeg" || 
+        file.mimetype === "image/jpeg" ||
         file.mimetype === "image/gif"
       ) {
         // check file type to be png, jpeg, or jpg
