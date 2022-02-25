@@ -60,6 +60,7 @@ export const uploadProfile = async (req, res) => {
     res.status(200).json({
       message: "Profile image uploaded successfully",
       profile_image: profileFileUrl,
+      statusCode: 200,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
