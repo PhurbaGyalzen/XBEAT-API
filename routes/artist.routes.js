@@ -17,6 +17,7 @@ import {
   getArtists,
   getOwnInfo,
   uploadProfile,
+  updateDetail,
 } from "../controllers/artist.controllers.js";
 import { deleteSong, uploadSong } from "../controllers/song.controllers.js";
 import Song from "../models/Song.js";
@@ -62,6 +63,9 @@ router.patch(
   uploadImage.single("image"),
   uploadProfile
 );
+
+// update profile detail
+router.patch("/artist/detail", verifyArtist, updateDetail);
 
 // delete a individual song of an artist
 router.delete(

@@ -36,7 +36,6 @@ export const loginArtist = async (req, res) => {
       token: token,
       role: artist.role,
       user_id: artist._id,
-
     });
   } catch (error) {
     console.log(error);
@@ -48,14 +47,16 @@ export const uploadProfile = async (req, res) => {
   try {
     console.log(req.file);
     const profileImageFileName = req.file.filename;
-    const profileFileUrl = `images/profile/${profileImageFileName}`
+    const profileFileUrl = `images/profile/${profileImageFileName}`;
     const artist = await User.findById(req.user._id);
     if (!artist) {
       res.status(404).json({ error: "Artist not found" });
       return;
     }
     // overwrite the profile image
-    const result = await User.findByIdAndUpdate(artist._id, { profile: profileFileUrl });
+    const result = await User.findByIdAndUpdate(artist._id, {
+      profile: profileFileUrl,
+    });
     // console.log(result);
     res.status(200).json({
       message: "Profile image uploaded successfully",
@@ -65,7 +66,36 @@ export const uploadProfile = async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-}
+};
+
+// update profile detail
+export const updateDetail = async (req, res) => {
+  try {
+    const artist = await User.findById(req.user._id);
+    if (!artist) {
+      res.status(404).json({ error: "Artist not found" });
+      return;
+    }
+
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const description = req.body.description;
+    console.log(firstName, lastName, description);
+    const docs = await User.findOne({"_id":artist._id});
+    console.log(docs);
+    docs.firstName = firstName;
+    docs.lastName = lastName;
+    docs.description = description;
+    await docs.save();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      statusCode: 200,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
 
 // Get Individual artist
 export const getIndividualArtist = async (req, res) => {
@@ -129,4 +159,3 @@ export const registerArtist = async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 };
-

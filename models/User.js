@@ -6,25 +6,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Username is required"],
     unique: true,
-    trim: true
+    trim: true,
   },
   password: {
     type: String,
-    required: [true, "Password is required"] // hide password from query
+    required: [true, "Password is required"], // hide password from query
   },
   firstName: {
     type: String,
     required: false,
-    trim: true,
-    validate: {
-      validator: function (value) {
-        return validator.isAlpha(value);
-      },
-      message: function () {
-        return "First name must be alphabetic";
-      }
-  }},
-  gener : {
+  },
+  gener: {
     type: String,
     required: false,
     validate: {
@@ -33,8 +25,9 @@ const userSchema = new mongoose.Schema({
       },
       message: function () {
         return "Gener must be alphabetic";
-      }
-  }},
+      },
+    },
+  },
   lastName: {
     type: String,
     required: false,
@@ -42,12 +35,12 @@ const userSchema = new mongoose.Schema({
   profile: {
     type: String,
     required: true,
-    default : "images/default-profile.jpg"
+    default: "images/default-profile.jpg",
   },
   description: {
     type: String,
-    required: true,
-    default : ""
+    required: false,
+    default: "",
   },
   followers: [
     {
@@ -88,16 +81,16 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    default: 'user',
-    enum: ['admin', 'user', 'artist'],
+    default: "user",
+    enum: ["admin", "user", "artist"],
     validate: {
-      validator: function(value) {
-        return value == 'admin' || value == 'user' || value == 'artist';
+      validator: function (value) {
+        return value == "admin" || value == "user" || value == "artist";
       },
-      message: function() {
+      message: function () {
         return "Role must be admin, user or artist";
-      }
-    }
+      },
+    },
   },
   isBlocked: {
     type: Boolean,
