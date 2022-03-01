@@ -53,28 +53,32 @@ const uploadAudio = multer({
   }),
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "audio") {
-      const fileTypes = /mp3|wav|mpeg/;
-      const mimetype = fileTypes.test(file.mimetype);
-      const extname = fileTypes.test(path.extname(file.originalname));
-      if (mimetype && extname) {
+      console.log(file.mimetype);
+      if (
+        file.mimetype === "audio/mpeg" ||
+        file.mimetype === "audio/vnd.wav" ||
+        file.mimetype === "application/octet-stream"
+      ) {
+        // check file type to be png, jpeg, or jpg
         return cb(null, true);
+      } else {
+        console.log(file);
+        cb("Error: Thumbnail should be image type.", false); // else fail
       }
-      cb(
-        "Error: File upload only supports the following file types - " +
-          fileTypes
-      );
     } else {
       // if image file
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||
         file.mimetype === "image/jpeg" ||
-        file.mimetype === "image/gif"
+        file.mimetype === "image/gif" ||
+        file.mimetype === "application/octet-stream"
       ) {
         // check file type to be png, jpeg, or jpg
         return cb(null, true);
       } else {
-        cb("Error: Thumnail should be image type.", false); // else fail
+        console.log(file);
+        cb("Error: Thumbnail should be image type.", false); // else fail
       }
     }
   },
